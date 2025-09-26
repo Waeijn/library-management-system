@@ -1,5 +1,10 @@
--- Create users table (for librarians & readers)
-CREATE TABLE IF NOT EXISTS users (
+-- Reset schema
+DROP TABLE IF EXISTS borrow_records;
+DROP TABLE IF EXISTS books;
+DROP TABLE IF EXISTS users;
+
+-- Users table
+CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
@@ -7,20 +12,20 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create books table
-CREATE TABLE IF NOT EXISTS books (
+-- Books table
+CREATE TABLE books (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     author VARCHAR(255) NOT NULL,
-    year YEAR,
+    year INT,  -- must be INT, not YEAR
     isbn VARCHAR(50) UNIQUE,
     genre VARCHAR(100),
     copies INT DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create borrow_records table
-CREATE TABLE IF NOT EXISTS borrow_records (
+-- Borrow Records
+CREATE TABLE borrow_records (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     book_id INT NOT NULL,
@@ -32,13 +37,12 @@ CREATE TABLE IF NOT EXISTS borrow_records (
 );
 
 -- Insert sample users
-INSERT INTO users (name, email, role) VALUES
-('Admin Librarian', 'admin@library.com', 'librarian'),
-('John Doe', 'john@example.com', 'user'),
-('Jane Smith', 'jane@example.com', 'user');
+INSERT IGNORE INTO users (name, email, role) VALUES
+('Librarian', 'librarian@library.com', 'librarian'),
+('User', 'user@example.com', 'user');
 
 -- Insert sample books
-INSERT INTO books (title, author, year, isbn, genre, copies) VALUES
+INSERT IGNORE INTO books (title, author, year, isbn, genre, copies) VALUES
 ('The Great Gatsby', 'F. Scott Fitzgerald', 1925, '9780743273565', 'Novel', 5),
 ('To Kill a Mockingbird', 'Harper Lee', 1960, '9780060935467', 'Fiction', 3),
 ('1984', 'George Orwell', 1949, '9780451524935', 'Dystopian', 4),

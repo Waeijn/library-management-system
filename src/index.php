@@ -5,6 +5,23 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 include 'db_connect.php';
+
+//Search Book
+$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+if (!empty($search)) {
+
+    $stmt = $conn->prepare("SELECT * FROM books 
+    WHERE title LIKE ? OR author LIKE ? OR isbn LIKE ?");
+
+    $like = "%" . $search . "%";
+    $stmt->bind_param("sss", $like, $like, $like);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+} else {
+    $result = $conn->query("SELECT * FROM books");
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -28,13 +45,18 @@ include 'db_connect.php';
     <nav>
         <?php if ($_SESSION['role'] === 'librarian'): ?>
             <a href="add_book.php">Add Book</a>
-            <a href="edit_book.php">Edit/Remove Books</a>
         <?php endif; ?>
         <a href="borrow_return.php">Borrow/Return</a>
         <a href="logout.php">Logout</a>
     </nav>
 
     <h2>Available Books</h2>
+
+    <!--Search Form -->
+    <form action="index.php" method="GET" style="margin-bottom: 20px">
+        <input type="search" name="search" placeholder="Search Book">
+        <button type="submit">Search</button>
+    </form>
     <?php include 'view_catalog.php'; ?>
 </body>
 

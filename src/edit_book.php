@@ -62,6 +62,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Edit Book</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="assets/main.js"></script>
 </head>
 
 <body>
@@ -94,10 +96,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="number" name="copies" min="1" value="<?php echo htmlspecialchars($book['copies']); ?>"
             required><br><br>
 
-        <button type="submit">💾 Save Changes</button>
+        <button type="submit">Save Changes</button>
     </form>
 
-    <p><a href="index.php">⬅ Back to Home</a></p>
+    <p><a href="index.php">Back to Home</a></p>
 </body>
 
 </html>

@@ -32,6 +32,31 @@ if (isset($_GET['delete'])) {
 
     header("Location: index.php");
 }
+
+// ✅ Fetch borrow records
+if ($_SESSION['role'] === 'librarian') {
+    // Librarian sees ALL borrow records
+    $borrowQuery = "
+        SELECT br.id, u.name AS user_name, b.title, br.borrow_date, br.due_date, br.return_date
+        FROM borrow_records br
+        JOIN users u ON br.user_id = u.id
+        JOIN books b ON br.book_id = b.id
+        ORDER BY br.borrow_date DESC
+    ";
+} else {
+    // Normal user only sees their own records
+    $user_id = $_SESSION['user_id'];
+    $borrowQuery = "
+        SELECT br.id, b.title, br.borrow_date, br.due_date, br.return_date
+        FROM borrow_records br
+        JOIN books b ON br.book_id = b.id
+        WHERE br.user_id = $user_id
+        ORDER BY br.borrow_date DESC
+    ";
+}
+
+$borrowRecords = $conn->query($borrowQuery);
+
 ?>
 
 <!DOCTYPE html>
@@ -69,13 +94,47 @@ if (isset($_GET['delete'])) {
     </nav>
 
 
-    <h2>Books</h2>
+    <h2>Book List</h2>
 
     <!--Search Form -->
     <input type="text" id="searchInput" placeholder="Search books..."
         style="margin-bottom: 20px; padding: 5px; width: 250px;">
 
     <?php include 'view_catalog.php'; ?>
+
+    <hr>
+    <h2>Borrow Records</h2>
+
+    <?php if ($borrowRecords && $borrowRecords->num_rows > 0): ?>
+        <table>
+            <tr>
+                <?php if ($_SESSION['role'] === 'librarian'): ?>
+                    <th>User</th>
+                <?php endif; ?>
+                <th>Book Title</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Return Date</th>
+            </tr>
+
+            <?php while ($row = $borrowRecords->fetch_assoc()): ?>
+                <tr>
+                    <?php if ($_SESSION['role'] === 'librarian'): ?>
+                        <td><?php echo htmlspecialchars($row['user_name']); ?></td>
+                    <?php endif; ?>
+                    <td><?php echo htmlspecialchars($row['title']); ?></td>
+                    <td><?php echo $row['borrow_date']; ?></td>
+                    <td><?php echo $row['due_date']; ?></td>
+                    <td><?php echo $row['return_date'] ?: 'Not Returned'; ?></td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    <?php else: ?>
+        <p>No borrow records found.</p>
+    <?php endif; ?>
+
+    <br>
+
 </body>
 
 </html>

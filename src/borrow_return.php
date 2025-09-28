@@ -98,6 +98,8 @@ if ($role === 'librarian') {
 <head>
     <meta charset="UTF-8">
     <title>Borrow / Return Books</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="assets/main.js"></script>
 </head>
 
 <body>

@@ -21,13 +21,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($stmt->execute()) {
-            $message = "✅ Book added successfully!";
+            $message = "Book added successfully!";
         } else {
-            $message = "❌ Error: " . $stmt->error;
+            $message = "Error: " . $stmt->error;
         }
         $stmt->close();
     } else {
-        $message = "⚠️ Title, Author, and Copies are required!";
+        $message = "Title, Author, and Copies are required!";
     }
 }
 ?>
@@ -38,6 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Add New Book</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="assets/main.js"></script>
 </head>
 
 <body>
@@ -69,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit">Add Book</button>
     </form>
 
-    <p><a href="index.php">⬅ Back to Home</a></p>
+    <p><a href="index.php">Back to Home</a></p>
 </body>
 
 </html>

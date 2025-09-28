@@ -33,7 +33,7 @@ if (isset($_GET['delete'])) {
     header("Location: index.php");
 }
 
-// ✅ Fetch borrow records
+// Fetch borrow records
 if ($_SESSION['role'] === 'librarian') {
     // Librarian sees ALL borrow records
     $borrowQuery = "

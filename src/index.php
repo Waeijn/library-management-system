@@ -22,6 +22,16 @@ if (!empty($search)) {
     $result = $conn->query("SELECT * FROM books");
 }
 
+//Delete Book
+if(isset($_GET['delete'])){
+    $id = (int)$_GET['delete'];
+
+    $stmt = $conn->prepare("DELETE FROM books WHERE id = ?");
+    $stmt->bind_param('i',$id);
+    $stmt->execute();
+
+    header("Location: index.php");
+}
 ?>
 
 <!DOCTYPE html>

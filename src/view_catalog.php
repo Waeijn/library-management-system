@@ -1,140 +1,43 @@
 <?php
-include 'db_connect.php';  // ✅ use correct db file
-
-$search = $_GET['search'] ?? '';
-$searchEscaped = $conn->real_escape_string($search);
-
-$where = $search
-    ? "WHERE b.title LIKE '%$searchEscaped%' 
-        OR b.author LIKE '%$searchEscaped%' 
-        OR b.genre LIKE '%$searchEscaped%' 
-        OR b.isbn LIKE '%$searchEscaped%'"
-    : '';
-
-$sql = "
-    SELECT b.*, (b.copies - COUNT(br.id)) AS available_copies
-    FROM books b
-    LEFT JOIN borrow_records br ON b.id = br.book_id AND br.return_date IS NULL
-    $where
-    GROUP BY b.id
-    ORDER BY b.title
-";
-
-$result = $conn->query($sql);
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include 'db_connect.php';
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Library Catalog</title>
 
-    <!-- Inline CSS -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            background-color: #f9f9f9;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-
-        form {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"] {
-            padding: 8px;
-            width: 350px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 8px 12px;
-            background-color: #007BFF;
-            border: none;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-        }
-
-        th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
-    <h1>📚 Library Catalog</h1>
-
-    <form method="GET">
-        <input type="text" name="search" placeholder="Search..." value="<?= htmlspecialchars($search) ?>" />
-        <button>Search</button>
-    </form>
-
-    <table>
-        <thead>
+<table border="1" cellpadding="8" cellspacing="0" width="100%">
+    <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Year</th>
+        <th>ISBN</th>
+        <th>Copies</th>
+        <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'librarian'): ?>
+            <th>Actions</th>
+        <?php endif; ?>
+    </tr>
+    <?php if ($result && $result->num_rows > 0): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
             <tr>
-                <th>Title</th><th>Author</th><th>Year</th><th>Genre</th><th>ISBN</th><th>Copies</th><th>Available</th>
+                <td><?php echo htmlspecialchars($row['title']); ?></td>
+                <td><?php echo htmlspecialchars($row['author']); ?></td>
+                <td><?php echo $row['year']; ?></td>
+                <td><?php echo $row['isbn'] ?></td>
+                <td><?php echo $row['copies']; ?></td>
+                <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'librarian'): ?>
+                    <td>
+                        <a href="edit_book.php?id=<?php echo $row['id']; ?>">✏️ Edit</a> |
+                        <a href="delete_book.php?id=<?php echo $row['id']; ?>"
+                            onclick="return confirm('Are you sure you want to delete this book?');">🗑️ Delete</a>
+                    </td>
+                <?php endif; ?>
             </tr>
-        </thead>
-        <tbody>
-            <?php if ($result->num_rows): ?>
-                <?php while ($b = $result->fetch_assoc()): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($b['title']) ?></td>
-                        <td><?= htmlspecialchars($b['author']) ?></td>
-                        <td><?= $b['year'] ?></td>
-                        <td><?= htmlspecialchars($b['genre']) ?></td>
-                        <td><?= htmlspecialchars($b['isbn']) ?></td>
-                        <td><?= $b['copies'] ?></td>
-                        <td><?= max(0, $b['available_copies']) ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <tr><td colspan="7">No books found.</td></tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-
-    <!-- Inline JS -->
-    <script>
-        // Autofocus the search input when the page loads
-        window.onload = () => {
-            const searchBox = document.querySelector('input[name="search"]');
-            if (searchBox) searchBox.focus();
-        };
-
-        // Show a loading message when the form is submitted
-        const form = document.querySelector('form');
-        form.addEventListener('submit', function (event) {
-            const searchBox = this.querySelector('input[name="search"]');
-            if (!searchBox.value.trim()) {
-                alert("Please enter a search term.");
-                event.preventDefault();
-            } else {
-                // Show loading message while the page reloads
-                const table = document.querySelector('table tbody');
-                table.innerHTML = "<tr><td colspan='7'>Searching...</td></tr>";
-            }
-        });
-    </script>
-</body>
-</html>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="<?php echo (isset($_SESSION['role']) && $_SESSION['role'] === 'librarian') ? 6 : 5; ?>">
+                No books found
+            </td>
+        </tr>
+    <?php endif; ?>
+</table>

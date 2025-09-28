@@ -23,11 +23,11 @@ if (!empty($search)) {
 }
 
 //Delete Book
-if(isset($_GET['delete'])){
-    $id = (int)$_GET['delete'];
+if (isset($_GET['delete'])) {
+    $id = (int) $_GET['delete'];
 
     $stmt = $conn->prepare("DELETE FROM books WHERE id = ?");
-    $stmt->bind_param('i',$id);
+    $stmt->bind_param('i', $id);
     $stmt->execute();
 
     header("Location: index.php");
@@ -40,6 +40,8 @@ if(isset($_GET['delete'])){
 <head>
     <meta charset="UTF-8">
     <title>Library Management System</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <script src="assets/main.js"></script>
 </head>
 
 <body>
@@ -56,17 +58,23 @@ if(isset($_GET['delete'])){
         <?php if ($_SESSION['role'] === 'librarian'): ?>
             <a href="add_book.php">Add Book</a>
         <?php endif; ?>
-        <a href="borrow_return.php">Borrow/Return</a>
+
+        <?php if ($_SESSION['role'] === 'librarian'): ?>
+            <a href="borrow_return.php">Return Books</a>
+        <?php else: ?>
+            <a href="borrow_return.php">Borrow Books</a>
+        <?php endif; ?>
+
         <a href="logout.php">Logout</a>
     </nav>
 
-    <h2>Available Books</h2>
+
+    <h2>Books</h2>
 
     <!--Search Form -->
-    <form action="index.php" method="GET" style="margin-bottom: 20px">
-        <input type="search" name="search" placeholder="Search Book">
-        <button type="submit">Search</button>
-    </form>
+    <input type="text" id="searchInput" placeholder="Search books..."
+        style="margin-bottom: 20px; padding: 5px; width: 250px;">
+
     <?php include 'view_catalog.php'; ?>
 </body>
 

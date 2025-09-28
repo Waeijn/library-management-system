@@ -40,26 +40,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Login - Library System</title>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 
 <body>
-    <h1>🔑 Library Login</h1>
 
-    <?php if ($message): ?>
-        <p style="color:red;"><?php echo $message; ?></p>
-    <?php endif; ?>
+    <div class="login-container">
+        <div class="login-box">
+            <h2>🔑 Library Login</h2>
 
-    <form method="POST" action="login.php">
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
-        <button type="submit">Login</button>
-    </form>
+            <?php if ($message): ?>
+                <p style="color:red;"><?php echo $message; ?></p>
+            <?php endif; ?>
 
-    <p>Try with:</p>
-    <ul>
-        <li>Librarian → <code>librarian@library.com</code></li>
-        <li>User → <code>user@example.com</code></li>
-    </ul>
+            <form method="POST" action="login.php">
+                <label>Email:</label><br>
+                <input type="email" name="email" required><br><br>
+                <button type="submit">Login</button>
+            </form>
+
+            <div style="margin-top: 15px;">
+                <p>Try with:</p>
+                <ul>
+                    <li>Librarian → <code>librarian@library.com</code></li>
+                    <li>User → <code>user@example.com</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>
